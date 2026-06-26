@@ -1,111 +1,78 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, limit, where } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
 
-const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getFirestore(app);
-let currentRows=[];
-const SCHOOL="स्व. गुरबक्षसिंग साबरवाल माध्यमिक व उच्च माध्यमिक विद्यालय, नायगाव (भिकापूर)";
-const $=id=>document.getElementById(id);
-const val=id=>($(id)?.value||"").trim();
-const show=(id,m)=>{const e=$(id); if(e)e.textContent=m;};
-const on=(id,ev,fn)=>{const e=$(id); if(e)e.addEventListener(ev,fn);}; // missing id असला तरी menu बंद पडणार नाही
-const today=()=>new Date().toISOString().slice(0,10);
+const SCHOOL = "स्व. गुरबक्षसिंग साबरवाल माध्यमिक व उच्च माध्यमिक विद्यालय, नायगाव (भिकापूर)";
+const DEFAULT_LOGO = "https://dummyimage.com/180x180/ffffff/0f766e.png&text=GBS";
+const $ = id => document.getElementById(id);
+const get = (k,d=[]) => JSON.parse(localStorage.getItem(k) || JSON.stringify(d));
+const set = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const today = () => new Date().toISOString().slice(0,10);
+const cleanMobile = m => { m=String(m||"").replace(/[^0-9]/g,""); return m.length===10 ? "91"+m : m; };
 
-window.addEventListener("DOMContentLoaded",()=>{
-  ["attDate","hwDate","holidayDate","eduDate","sportsDate","examDate","teacherAttDate"].forEach(id=>{if($(id)&&!$(id).value)$(id).value=today()});
-  initMenus();
-  attachEvents();
-});
+const templates = {
+"विद्यार्थी उपस्थित": "आदरणीय पालक,\nआपले पाल्य {student} इयत्ता {class} आज दिनांक {date} रोजी वेळ {time} वाजता शाळेत उपस्थित झाले आहेत.\nवर्ग शिक्षक : {teacher}\n{school}",
+"विद्यार्थी अनुपस्थित": "आदरणीय पालक,\nआज दिनांक {date} रोजी आपले पाल्य {student} इयत्ता {class} शाळेत अनुपस्थित आहेत. कृपया अनुपस्थितीचे कारण वर्ग शिक्षकांना कळवावे.\nवर्ग शिक्षक : {teacher}\n{school}",
+"Half Day सूचना": "आदरणीय पालक,\nआपले पाल्य {student} इयत्ता {class} आज दिनांक {date} रोजी अर्धवेळ उपस्थित राहिले / सुट्टी घेऊन गेले आहेत. कृपया नोंद घ्यावी.\nवर्ग शिक्षक : {teacher}\n{school}",
+"गणित गृहपाठ": "आदरणीय पालक,\nआजचा गणित विषयाचा गृहपाठ:\n{custom}\nकृपया वहीत सोडवून उद्या पाठवावा.\nवर्ग शिक्षक : {teacher}\n{school}",
+"सुट्टीची सूचना": "आदरणीय पालक,\nदिनांक {date} रोजी {custom} निमित्त शाळेला सुट्टी राहील. कृपया नोंद घ्यावी.\n{school}",
+"परीक्षा सूचना": "आदरणीय पालक,\nदिनांक {date} पासून {custom} परीक्षा/चाचणी सुरू होत आहे. कृपया पाल्याची तयारी करून घ्यावी.\n{school}",
+"पालक सभा": "आदरणीय पालक,\nदिनांक {date} रोजी {custom} या संदर्भात पालक सभा आयोजित करण्यात आली आहे. कृपया वेळेवर उपस्थित राहावे.\n{school}",
+"फी भरणा सूचना": "आदरणीय पालक,\nआपल्या पाल्याची शालेय फी/बाकी रक्कम प्रलंबित आहे. कृपया ती लवकरात लवकर भरावी.\n{school}"
+};
 
-function initMenus(){
-  document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>{
-    document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    b.classList.add("active");
-    const page=$(b.dataset.page);
-    if(page) page.classList.add("active");
-    window.scrollTo({top:0,behavior:"smooth"});
-  }));
+function settings(){return get("settings",{apiUrl:"",apiToken:"",apiDevice:"",teacher:"श्री पवार डी.एम.",specialTeacher:"",logo:DEFAULT_LOGO});}
+function fill(t, o){return t.replaceAll("{student}",o.student||"").replaceAll("{class}",o.class||"").replaceAll("{date}",o.date||today()).replaceAll("{time}",o.time||new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})).replaceAll("{teacher}",o.teacher||settings().teacher).replaceAll("{school}",SCHOOL).replaceAll("{custom}",o.custom||"");}
+
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+function showTab(id){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelector(`[data-tab="${id}"]`).classList.add("active");document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));$(id).classList.remove("hidden"); if(id==="settings") loadSettings(); if(id==="reports") renderReports(); if(id==="students") renderStudents(); if(id==="links") renderLinks(); if(id==="users") renderUsers();}
+
+function init(){["aDate","hDate","nDate"].forEach(id=>$(id).value=today()); loadSettings(); renderStudents(); renderAttendance(); renderLinks(); renderUsers(); updateKpi(); loadTemplate();}
+window.onload=init;
+
+function updateKpi(){ $("kStudents").textContent=get("students").length; $("kAttend").textContent=get("attendance").length; $("kHomework").textContent=get("homework").length; $("kNotice").textContent=get("notice").length; }
+function logout(){alert("Demo logout. Firebase जोडल्यावर पूर्ण logout चालेल.");}
+
+async function addStudent(){
+ let mobile=cleanMobile($("sMobile").value);
+ if(mobile.length<12) return $("studentMsg").textContent="मोबाईल नंबर 10 अंक किंवा 91 सहित असावा.";
+ if($("sAadhar").value && !/^\d{12}$/.test($("sAadhar").value)) return $("studentMsg").textContent="आधार 12 अंक असावा.";
+ let arr=get("students"); arr.push({id:Date.now(),name:$("sName").value,class:$("sClass").value,roll:$("sRoll").value,dob:$("sDob").value,aadhar:$("sAadhar").value,mobile}); set("students",arr);
+ $("studentMsg").textContent="विद्यार्थी सेव्ह झाला."; renderStudents(); updateKpi();
+}
+function renderStudents(){let arr=get("students"); $("studentTable").innerHTML="<tr><th>Roll</th><th>Name</th><th>Class</th><th>Mobile</th><th>DOB</th><th>Aadhar</th></tr>"+arr.map(s=>`<tr><td>${s.roll||""}</td><td>${s.name||""}</td><td>${s.class||""}</td><td>${s.mobile||""}</td><td>${s.dob||""}</td><td>${s.aadhar||""}</td></tr>`).join(""); renderAttendance();}
+function renderAttendance(){let cls=$("aClass").value; let arr=get("students").filter(s=>s.class===cls); $("attTable").innerHTML="<tr><th>Roll</th><th>Name</th><th>P/A</th><th>Time</th><th>Message</th></tr>"+arr.map(s=>`<tr><td>${s.roll}</td><td>${s.name}</td><td><select id="pa_${s.id}"><option>P</option><option>A</option><option>Half Day</option></select></td><td><input id="tm_${s.id}" value="${new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"})}"></td><td><textarea id="ms_${s.id}"></textarea></td></tr>`).join("");}
+function saveAttendanceAll(){let cls=$("aClass").value; let arr=get("students").filter(s=>s.class===cls); let logs=get("attendance"); arr.forEach(s=>logs.push({date:$("aDate").value,class:cls,student:s.name,mobile:s.mobile,status:$("pa_"+s.id).value,time:$("tm_"+s.id).value,msg:$("ms_"+s.id).value})); set("attendance",logs); $("attMsg").textContent="उपस्थिती सेव्ह झाली."; updateKpi();}
+async function sendAttendanceAll(){saveAttendanceAll(); let cls=$("aClass").value; let arr=get("students").filter(s=>s.class===cls); let sent=0,fail=0; for(const s of arr){let st=$("pa_"+s.id).value; let tp=st==="A"?"विद्यार्थी अनुपस्थित":(st==="Half Day"?"Half Day सूचना":"विद्यार्थी उपस्थित"); let msg=$("ms_"+s.id).value || fill(templates[tp],{student:s.name,class:cls,date:$("aDate").value,time:$("tm_"+s.id).value}); let ok=await sendWhatsApp(s.mobile,msg); ok?sent++:fail++; await new Promise(r=>setTimeout(r,900));} $("attMsg").textContent=`WhatsApp पूर्ण: Success ${sent}, Failed ${fail}`;}
+
+function saveHomework(){let arr=get("homework"); arr.push({date:$("hDate").value,class:$("hClass").value,subject:$("hSubject").value,topic:$("hTopic").value,teaching:$("hTeaching").value,work:$("hWork").value}); set("homework",arr); $("hwMsg").textContent="गृहपाठ सेव्ह झाला."; updateKpi();}
+async function sendHomework(){saveHomework(); let cls=$("hClass").value; let students=get("students").filter(s=>s.class===cls); let msg=fill(templates["गणित गृहपाठ"],{class:cls,date:$("hDate").value,custom:`${$("hSubject").value}\nTopic: ${$("hTopic").value}\nवर्गात शिकवले: ${$("hTeaching").value}\nगृहपाठ: ${$("hWork").value}`}); let sent=0,fail=0; for(const s of students){(await sendWhatsApp(s.mobile,msg))?sent++:fail++; await new Promise(r=>setTimeout(r,900));} $("hwMsg").textContent=`गृहपाठ WhatsApp: Success ${sent}, Failed ${fail}`;}
+
+function noticeMessage(){let type=$("nType").value; let base=templates[type]||templates["सुट्टीची सूचना"]; return fill(base,{class:$("nClass").value,date:$("nDate").value,custom:$("nDetails").value});}
+function previewNotice(){ $("nPreview").value=noticeMessage(); }
+function saveNotice(){let arr=get("notice"); arr.push({date:$("nDate").value,class:$("nClass").value,type:$("nType").value,details:$("nDetails").value,msg:noticeMessage()}); set("notice",arr); $("noticeMsgBox").textContent="सूचना सेव्ह झाली."; updateKpi();}
+async function sendNotice(){previewNotice(); saveNotice(); let msg=noticeMessage(); let mob=cleanMobile($("nMobile").value); let list=mob?[{mobile:mob}]:get("students").filter(s=>$("nClass").value==="सर्व वर्ग"||s.class===$("nClass").value); let sent=0,fail=0; for(const s of list){(await sendWhatsApp(s.mobile,msg))?sent++:fail++; await new Promise(r=>setTimeout(r,900));} $("noticeMsgBox").textContent=`सूचना WhatsApp: Success ${sent}, Failed ${fail}`;}
+
+function loadTemplate(){ $("templateText").value=templates[$("templateType").value]||""; }
+function copyTemplate(){ $("templateText").select(); document.execCommand("copy"); alert("Template Copy झाला.");}
+
+function addLink(){let arr=get("links"); arr.push({title:$("linkTitle").value,url:$("linkUrl").value}); set("links",arr); renderLinks();}
+function renderLinks(){let arr=get("links"); $("linkTable").innerHTML="<tr><th>Title</th><th>Link</th></tr>"+arr.map(x=>`<tr><td>${x.title}</td><td><a target="_blank" href="${x.url}">Open</a></td></tr>`).join("");}
+
+function addUser(){let arr=get("users"); arr.push({name:$("uName").value,role:$("uRole").value,pass:$("uPass").value}); set("users",arr); renderUsers();}
+function renderUsers(){let arr=get("users"); $("userTable").innerHTML="<tr><th>Name</th><th>Role</th><th>Password</th></tr>"+arr.map(u=>`<tr><td>${u.name}</td><td>${u.role}</td><td>${u.pass}</td></tr>`).join("");}
+
+function loadSettings(){let s=settings(); $("apiUrl").value=s.apiUrl; $("apiToken").value=s.apiToken; $("apiDevice").value=s.apiDevice; $("setTeacher").value=s.teacher; $("setSpecialTeacher").value=s.specialTeacher||""; $("setLogo").value=s.logo||""; $("schoolLogo").src=s.logo||DEFAULT_LOGO;}
+function saveSettings(){set("settings",{apiUrl:$("apiUrl").value.trim().replace(/\/$/,""),apiToken:$("apiToken").value.trim(),apiDevice:$("apiDevice").value.trim(),teacher:$("setTeacher").value,specialTeacher:$("setSpecialTeacher").value,logo:$("setLogo").value||DEFAULT_LOGO}); loadSettings(); $("settingMsg").textContent="Settings save झाले.";}
+async function sendManual(){let ok=await sendWhatsApp($("manualMobile").value,$("manualMessage").value); $("manualMsg").textContent=ok?"Message request success.":"Message failed. Console तपासा.";}
+
+async function sendWhatsApp(mobile,message){
+ let s=settings(); let base=(s.apiUrl||"").replace(/\/$/,"");
+ if(!base) { console.error("API URL blank"); return false; }
+ let url=`${base}/send_sms?mobile=${encodeURIComponent(cleanMobile(mobile))}&message=${encodeURIComponent(message)}&api_token=${encodeURIComponent(s.apiToken)}&device_id=${encodeURIComponent(s.apiDevice)}`;
+ try{let r=await fetch(url); let t=await r.text(); console.log("WhatsBot response",r.status,t); return r.ok && !/error|failed|invalid|unauthorized/i.test(t);}
+ catch(e){console.error(e); return false;}
 }
 
-const mob91=m=>{m=(m||"").replace(/\D/g,"");return m.length===10?"91"+m:m};
-async function saveDoc(col,data){return addDoc(collection(db,col),{...data,createdAt:serverTimestamp(),createdBy:auth.currentUser?.email||""})}
-function settings(){return{base:localStorage.getItem("apiBase")||"https://whatsbot.tech/api",token:localStorage.getItem("apiToken")||"30f4848f-ed51-42e0-989c-685204f085a2",deviceId:localStorage.getItem("deviceId")||"46081"}}
-async function api(endpoint,params){const s=settings();params.api_token=s.token;if(s.deviceId)params.device_id=s.deviceId;const url=`${s.base}/${endpoint}?`+new URLSearchParams(params);const res=await fetch(url);const text=await res.text();await saveDoc("whatsbot_logs",{endpoint,params,response:text});return text}
-async function sendText(mobile,message){mobile=mob91(mobile);if(!/^91\d{10}$/.test(mobile))throw new Error("मोबाईल 91 सहित योग्य द्या");return api("send_sms",{mobile,message})}
-async function sendMedia(type,mobile,url,caption=""){mobile=mob91(mobile);if(type==="img")return api("send_img",{mobile,img_url:url,img_caption:caption});if(type==="doc")return api("send_doc",{mobile,doc_url:url});if(type==="video")return api("send_video",{mobile,video_url:url})}
-
-function template(type,o={}){
- const base=`${SCHOOL}\n`;
- const end=`\n- ${o.teacher||"वर्ग शिक्षक"}`;
- if(type==="present")return base+`आदरणीय पालक, आपला विद्यार्थी ${o.student||""} इयत्ता ${o.className||""} दिनांक ${o.date||""} रोजी शाळेत उपस्थित आहे.`+end;
- if(type==="absent")return base+`आदरणीय पालक, आपला विद्यार्थी ${o.student||""} इयत्ता ${o.className||""} दिनांक ${o.date||""} रोजी अनुपस्थित आहे. कृपया अनुपस्थितीचे कारण शाळेला कळवावे.`+end;
- if(type==="halfday")return base+`आपला विद्यार्थी ${o.student||""} इयत्ता ${o.className||""} दिनांक ${o.date||""} रोजी हाफ डे उपस्थित राहिला / रजा घेऊन गेला आहे.`+end;
- if(type==="homework")return base+`इयत्ता: ${o.className||""}\nविषय: ${o.subject||""}\nधडा: ${o.topic||""}\nआज वर्गात शिकवले: ${o.classwork||""}\nगृहपाठ: ${o.homework||""}`+end;
- if(type==="holiday")return base+`सुट्टीची सूचना\nइयत्ता: ${o.className||""}\nदिनांक: ${o.date||""}\nतपशील: ${o.text||""}`+end;
- if(type==="edu")return base+`शैक्षणिक कार्यक्रम सूचना\nइयत्ता: ${o.className||""}\nदिनांक: ${o.date||""}\nतपशील: ${o.text||""}`+end;
- if(type==="sports")return base+`क्रीडा कार्यक्रम सूचना\nइयत्ता: ${o.className||""}\nदिनांक: ${o.date||""}\nतपशील: ${o.text||""}`+end;
- if(type==="exam")return base+`परीक्षा सूचना\nइयत्ता: ${o.className||""}\nदिनांक: ${o.date||""}\nतपशील: ${o.text||""}`+end;
- if(type==="fee")return base+`फी सूचना\nआदरणीय पालक, आपल्या पाल्याची प्रलंबित फी नियोजित वेळेत भरावी.`+end;
- if(type==="ptm")return base+`पालक सभा सूचना\nदिनांक ${o.date||today()} रोजी पालक सभा आयोजित करण्यात आली आहे. कृपया उपस्थित राहावे.`+end;
- return base+(o.text||"")+end;
-}
-
-function attachEvents(){
-  on("loginBtn","click",async()=>{try{await signInWithEmailAndPassword(auth,val("email"),val("password"));show("loginMsg","")}catch(e){show("loginMsg","Login Error: "+e.message)}});
-  on("resetBtn","click",async()=>{try{await sendPasswordResetEmail(auth,val("email"));show("loginMsg","Password reset email पाठवला आहे.")}catch(e){show("loginMsg","Error: "+e.message)}});
-  on("logoutBtn","click",()=>signOut(auth));
-
-  on("createUserBtn","click",async()=>{try{await createUserWithEmailAndPassword(auth,val("newUserEmail"),val("newUserPassword"));await saveDoc("users",{email:val("newUserEmail")});show("createUserMsg","User ID तयार झाला: "+val("newUserEmail"))}catch(e){show("createUserMsg","Error: "+e.message)}});
-
-  on("startCamera","click",async()=>{try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false});$("cameraPreview").srcObject=stream}catch(e){show("studentMsg","Camera Error: "+e.message)}});
-  on("capturePhoto","click",()=>{const v=$("cameraPreview"),c=$("photoCanvas");c.width=v.videoWidth||640;c.height=v.videoHeight||480;c.getContext("2d").drawImage(v,0,0,c.width,c.height);const d=c.toDataURL("image/jpeg",.7);$("photoPreview").src=d;$("studentPhotoUrl").value=d;show("studentMsg","फोटो capture झाला.")});
-  on("addStudentBtn","click",addStudent);
-
-  on("loadStudentList","click",loadAttRows);
-  on("saveAttendanceAll","click",saveAttendanceAll);
-  on("saveTeacherAttendance","click",async()=>{try{await saveDoc("teacher_attendance",{name:val("teacherAttName"),status:val("teacherAttStatus"),date:val("teacherAttDate"),note:val("teacherAttNote")});show("teacherAttMsg","शिक्षक उपस्थिती save झाली.")}catch(e){show("teacherAttMsg","Error: "+e.message)}});
-
-  on("previewHomework","click",()=>show("homeworkPreview",homeworkMessage()));
-  on("saveHomework","click",saveHomework);
-  on("sendHomeworkWhatsApp","click",async()=>{try{show("homeworkMsg","WhatsApp: "+await sendText(val("homeworkMobile"),homeworkMessage()))}catch(e){show("homeworkMsg","Error: "+e.message)}});
-
-  on("sendHoliday","click",()=>sendNotice("holiday","holidayClass","holidayDate","holidayText","holidayMobile","holidayMsg"));
-  on("sendEduEvent","click",()=>sendNotice("edu","eduClass","eduDate","eduText","eduMobile","eduMsg"));
-  on("sendSports","click",()=>sendNotice("sports","sportsClass","sportsDate","sportsText","sportsMobile","sportsMsg"));
-  on("sendExam","click",()=>sendNotice("exam","examClass","examDate","examText","examMobile","examMsg"));
-
-  on("generateTemplate","click",()=>{$("templateText").value=template(val("templateType"),{student:val("tplStudent")||"विद्यार्थी नाव",className:val("tplClass"),date:today(),teacher:val("tplTeacher")||"वर्ग शिक्षक",subject:"गणित",topic:"धडा",classwork:"आज शिकवलेला भाग",homework:"दिलेला गृहपाठ",text:"सूचना तपशील"});});
-  on("copyTemplate","click",()=>{$("templateText").select();document.execCommand("copy")});
-
-  on("saveApiSettings","click",()=>{localStorage.setItem("apiBase",val("apiBase"));localStorage.setItem("apiToken",val("apiToken"));localStorage.setItem("deviceId",val("deviceId"));show("apiSettingsMsg","Settings save झाले.")});
-  on("sendManualText","click",async()=>{try{show("manualMsg",await sendText(val("manualMobile"),val("manualText")))}catch(e){show("manualMsg","Error: "+e.message)}});
-  on("sendMedia","click",async()=>{try{show("manualMsg",await sendMedia(val("mediaType"),val("manualMobile"),val("mediaUrl"),val("mediaCaption")))}catch(e){show("manualMsg","Error: "+e.message)}});
-
-  on("saveStudyLink","click",async()=>{try{await saveDoc("study_links",{className:val("studyClass"),subject:val("studySubject"),title:val("studyTitle"),url:val("studyUrl")});show("studyMsg","Study link save झाली.")}catch(e){show("studyMsg","Error: "+e.message)}});
-  on("downloadStudentTemplate","click",()=>downloadCsv("student_template.csv",[["name","dob","aadhaar","className","section","rollNo","parentMobile1","parentMobile2","parentMobile3","address"],["कु. विद्यार्थी नाव","2012-01-01","123456789012","9वी","A","1","9876543210","","","पत्ता"]]));
-  on("uploadStudentCsv","click",uploadCsv);
-  on("loadStudentsReport","click",()=>loadCol("students",["name","className","section","rollNo","parentMobile1"]));
-  on("loadAttendanceReport","click",()=>loadCol("attendance",["date","name","className","status","time","message"]));
-  on("loadHomeworkReport","click",()=>loadCol("homework",["className","date","teacher","subject","topic","classwork","homework"]));
-  on("loadNoticeReport","click",()=>loadCol("notices",["type","className","date","text"]));
-  on("exportCsvBtn","click",()=>downloadCsv("report.csv",[Object.keys(currentRows[0]||{}),...currentRows.map(r=>Object.values(r).map(v=>typeof v==="object"?"":v))]));
-}
-
-onAuthStateChanged(auth,u=>{$("loginCard")?.classList.toggle("hidden",!!u);$("appPanel")?.classList.toggle("hidden",!u);if(u){$("userEmail").textContent=u.email;loadSettings();}});
-
-function loadSettings(){if($("apiBase"))$("apiBase").value=settings().base;if($("apiToken"))$("apiToken").value=settings().token;if($("deviceId"))$("deviceId").value=settings().deviceId}
-async function addStudent(){try{await saveDoc("students",{name:val("studentName"),dob:val("studentDob"),aadhaar:val("studentAadhaar"),className:val("studentClass"),section:val("studentSection"),rollNo:val("studentRoll"),fatherName:val("fatherName"),motherName:val("motherName"),parentMobile1:val("parentMobile1"),parentMobile2:val("parentMobile2"),parentMobile3:val("parentMobile3"),address:val("studentAddress"),photoUrl:val("studentPhotoUrl")});show("studentMsg","विद्यार्थी डेटा save झाला.")}catch(e){show("studentMsg","Error: "+e.message)}}
-
-async function loadAttRows(){try{const snap=await getDocs(query(collection(db,"students"),where("className","==",val("attClass")),limit(200)));$("attBody").innerHTML="";let i=1;snap.forEach(d=>{const s=d.data();$("attBody").innerHTML+=`<tr data-mobile="${s.parentMobile1||""}" data-name="${s.name||""}" data-class="${s.className||""}"><td>${s.rollNo||i}</td><td>${s.name||""}</td><td><select class="pa"><option>P</option><option>A</option><option>Half Day</option><option>Leave</option><option>Late</option></select></td><td><input class="time" type="time"></td><td><textarea class="note"></textarea></td><td class="sendStatus">Ready</td></tr>`;i++});document.querySelectorAll(".pa").forEach(sel=>sel.addEventListener("change",autoSendAttendance));show("attMsg","यादी लोड झाली. P/A बदलल्यावर Auto WhatsApp पाठवला जाईल.")}catch(e){show("attMsg","Error: "+e.message)}}
-function attMsg(row){const st=row.querySelector(".pa").value;let t=st==="A"?"absent":st==="Half Day"?"halfday":"present";return template(t,{student:row.dataset.name,className:val("attClass"),date:val("attDate")})+"\n"+row.querySelector(".note").value}
-async function autoSendAttendance(e){const row=e.target.closest("tr");row.querySelector(".sendStatus").textContent="Sending...";try{await saveDoc("attendance",{name:row.dataset.name,className:val("attClass"),date:val("attDate"),status:row.querySelector(".pa").value,time:row.querySelector(".time").value,message:row.querySelector(".note").value,parentMobile:row.dataset.mobile});if(val("autoSend")==="yes"){const r=await sendText(row.dataset.mobile,attMsg(row));row.querySelector(".sendStatus").textContent="Sent";show("attMsg","Auto WhatsApp पाठवला: "+r)}else{row.querySelector(".sendStatus").textContent="Saved"}}catch(err){row.querySelector(".sendStatus").textContent="Error";show("attMsg","Error: "+err.message)}}
-async function saveAttendanceAll(){try{for(const row of document.querySelectorAll("#attBody tr"))await saveDoc("attendance",{name:row.dataset.name,className:val("attClass"),date:val("attDate"),status:row.querySelector(".pa").value,time:row.querySelector(".time").value,message:row.querySelector(".note").value,parentMobile:row.dataset.mobile});show("attMsg","Attendance save झाली.")}catch(e){show("attMsg","Error: "+e.message)}}
-
-function homeworkMessage(){return template("homework",{className:val("hwClass"),date:val("hwDate"),teacher:val("hwTeacher"),subject:val("hwSubject"),topic:val("hwTopic"),classwork:val("classworkDone"),homework:val("homeworkGiven")})}
-async function saveHomework(){try{await saveDoc("homework",{className:val("hwClass"),date:val("hwDate"),teacher:val("hwTeacher"),subject:val("hwSubject"),topic:val("hwTopic"),classwork:val("classworkDone"),homework:val("homeworkGiven")});show("homeworkMsg","Homework save झाला.")}catch(e){show("homeworkMsg","Error: "+e.message)}}
-async function sendNotice(type,clsId,dateId,textId,mobId,msgId){try{const data={type,className:val(clsId),date:val(dateId),text:val(textId)};await saveDoc("notices",data);show(msgId,"WhatsApp: "+await sendText(val(mobId),template(type,data)))}catch(e){show(msgId,"Error: "+e.message)}}
-async function uploadCsv(){const f=$("studentCsvFile").files[0];if(!f)return show("csvMsg","CSV निवडा");const text=await f.text();const rows=text.trim().split(/\\r?\\n/);const head=rows.shift().split(",").map(x=>x.replace(/^\"|\"$/g,"").trim());let c=0;for(const line of rows){const vals=line.split(",").map(x=>x.replace(/^\"|\"$/g,""));const o={};head.forEach((h,i)=>o[h]=vals[i]||"");await saveDoc("students",o);c++}show("csvMsg",c+" विद्यार्थी upload झाले.")}
-async function loadCol(col,keys){const snap=await getDocs(query(collection(db,col),limit(200)));currentRows=[];$("reportHead").innerHTML="<tr>"+keys.map(k=>`<th>${k}</th>`).join("")+"</tr>";$("reportBody").innerHTML="";snap.forEach(d=>{const r=d.data();currentRows.push(r);$("reportBody").innerHTML+="<tr>"+keys.map(k=>`<td>${r[k]||""}</td>`).join("")+"</tr>"})}
-function downloadCsv(name,rows){const csv=rows.map(r=>r.map(x=>`"${String(x||"").replaceAll('"','""')}"`).join(",")).join("\\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function downloadStudentTemplate(){let csv="name,class,roll,dob,aadhar,mobile\nकु. विद्यार्थी नाव,9वी,1,2010-01-01,123456789012,917507514475\n"; download("student_template.csv",csv);}
+function uploadCSV(){let f=$("csvFile").files[0]; if(!f) return; let rd=new FileReader(); rd.onload=()=>{let lines=rd.result.split(/\r?\n/).filter(Boolean); let arr=get("students"); lines.slice(1).forEach(l=>{let [name,cls,roll,dob,aadhar,mobile]=l.split(","); if(name) arr.push({id:Date.now()+Math.random(),name,class:cls,roll,dob,aadhar,mobile:cleanMobile(mobile)});}); set("students",arr); $("csvMsg").textContent="CSV Upload झाले."; renderStudents(); updateKpi();}; rd.readAsText(f);}
+function renderReports(){let logs=get("attendance"); $("reportTable").innerHTML="<tr><th>Date</th><th>Class</th><th>Name</th><th>Status</th><th>Time</th><th>Mobile</th></tr>"+logs.map(x=>`<tr><td>${x.date}</td><td>${x.class}</td><td>${x.student}</td><td>${x.status}</td><td>${x.time}</td><td>${x.mobile}</td></tr>`).join("");}
+function downloadAttendanceCSV(){let logs=get("attendance"); let csv="date,class,student,status,time,mobile\n"+logs.map(x=>[x.date,x.class,x.student,x.status,x.time,x.mobile].map(v=>`"${String(v||"").replaceAll('"','""')}"`).join(",")).join("\n"); download("attendance_report.csv",csv);}
+function download(name,content){let a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([content],{type:"text/csv"})); a.download=name; a.click();}
