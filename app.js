@@ -10,10 +10,10 @@ export default async function handler(req, res) {
   try {
     const data = req.method === "POST" ? req.body : req.query;
 
-    const api_token = data.api_token || data.token;
+    const api_token = data.api_token || data.token || "";
     const device_id = data.device_id || "";
-    const mobile = data.mobile;
-    const message = data.message;
+    const mobile = data.mobile || "";
+    const message = data.message || "";
 
     if (!api_token || !mobile || !message) {
       return res.status(400).json({
@@ -22,12 +22,10 @@ export default async function handler(req, res) {
       });
     }
 
-    const params = new URLSearchParams({
-      api_token,
-      mobile,
-      message
-    });
-
+    const params = new URLSearchParams();
+    params.set("api_token", api_token);
+    params.set("mobile", mobile);
+    params.set("message", message);
     if (device_id) params.set("device_id", device_id);
 
     const response = await fetch(
@@ -38,6 +36,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       status: true,
+      proxy: "working",
       whatsbot_status: response.status,
       response: text
     });
