@@ -3,10 +3,13 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") return res.status(200).json({ status: true });
+  if (req.method === "OPTIONS") {
+    return res.status(200).json({ status: true });
+  }
 
   try {
     const data = req.method === "POST" ? req.body : req.query;
+
     const api_token = data.api_token || data.token || "";
     const device_id = data.device_id || "";
     const mobile = data.mobile || "";
@@ -25,20 +28,30 @@ export default async function handler(req, res) {
     params.set("message", message);
     if (device_id) params.set("device_id", device_id);
 
-    const response = await fetch("https://whatsbot.tech/api/send_sms?" + params.toString());
+    const whatsbotUrl = "https://whatsbot.tech/api/send_sms?" + params.toString();
+    const response = await fetch(whatsbotUrl, { method: "GET" });
     const text = await response.text();
 
     let parsed = null;
-    try { parsed = JSON.parse(text); } catch (e) {}
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      parsed = text;
+    }
 
     return res.status(200).json({
       status: true,
       proxy: "working",
       endpoint: "send_sms",
       whatsbot_status: response.status,
-      response: parsed || text
+      response: parsed
     });
+
   } catch (error) {
-    return res.status(500).json({ status: false, error: error.message });
+    return res.status(500).json({
+      status: false,
+      proxy: "error",
+      error: error.message
+    });
   }
 }

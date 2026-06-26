@@ -1,30 +1,30 @@
-School ERP V6.1 Full Project
+VERIFIED WhatsBot Proxy API Project
 
-या ZIP मध्ये पूर्ण प्रोजेक्ट आहे:
-- index.html
-- style.css
-- app.js
-- package.json
-- vercel.json
-- api/health.js
-- api/send_sms.js
+ही फाईल रचना बरोबर आहे:
 
-GitHub Upload:
-1. नवीन repository तयार करा किंवा जुनी रिकामी करा.
-2. ZIP extract करा.
-3. सर्व files upload करा.
-4. GitHub मध्ये api folder दिसला पाहिजे.
-5. api folder मध्ये health.js आणि send_sms.js दिसले पाहिजे.
+api/
+  health.js
+  send_sms.js
+package.json
+vercel.json
 
-Vercel:
-1. Import Git Repository
-2. Deploy
-3. Test URL:
-   https://YOUR-VERCEL-URL.vercel.app/api/health
+महत्त्वाचे:
+1. send_sms.js हा code app.js मध्ये टाकू नये.
+2. api/send_sms.js या exact path मध्येच हवा.
+3. api/health.js या exact path मध्येच हवा.
+4. GitHub वर upload केल्यानंतर api folder दिसला पाहिजे.
+5. Vercel वर Redeploy करा.
 
-JSON response आला तर API चालू आहे.
+Test 1:
+https://YOUR-VERCEL-URL.vercel.app/api/health
 
-School ERP Settings:
+Expected:
+{"status":true,"message":"WhatsBot Proxy API is working"}
+
+Test 2:
+https://YOUR-VERCEL-URL.vercel.app/api/send_sms?mobile=917507514475&message=test&api_token=30f4848f-ed51-42e0-989c-685204f085a2&device_id=46081
+
+ERP Settings:
 Proxy API URL:
 https://YOUR-VERCEL-URL.vercel.app/api
 
@@ -33,7 +33,3 @@ API Token:
 
 Device ID:
 46081
-
-Important:
-WhatsApp API send_sms direct browser test:
-https://YOUR-VERCEL-URL.vercel.app/api/send_sms?mobile=917507514475&message=test&api_token=30f4848f-ed51-42e0-989c-685204f085a2&device_id=46081
