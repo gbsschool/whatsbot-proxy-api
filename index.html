@@ -1,55 +1,19 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>School ERP V6.0 Final</title>
-<style>
-  :root{--blue:#0f4c81;--teal:#0f8b7f;--gold:#f5a623;--dark:#14213d;--bg:#eef4f8;--card:#fff}
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Arial,'Noto Sans Devanagari',sans-serif;background:var(--bg);color:#17202a}
-  .top{background:linear-gradient(120deg,#0f4c81,#0f8b7f);color:#fff;padding:18px 22px;border-bottom:5px solid var(--gold)}
-  .brand{display:flex;gap:18px;align-items:center;max-width:1200px;margin:auto}
-  .logo{width:90px;height:90px;border-radius:50%;background:white;object-fit:contain;padding:4px}
-  h1{font-size:30px;margin:0 0 6px;font-weight:800}
-  .sub{font-size:17px;opacity:.95}
-  nav{background:#111827;position:sticky;top:0;z-index:10;overflow-x:auto;white-space:nowrap}
-  nav button{background:transparent;color:#fff;border:0;padding:16px 20px;font-weight:700;font-size:16px;cursor:pointer}
-  nav button.active{background:var(--gold);color:#111827}
-  .wrap{max-width:1200px;margin:20px auto;padding:0 14px}
-  .userbar{background:#fff;padding:14px;border-radius:12px;margin-bottom:16px;box-shadow:0 4px 18px #0001;display:flex;justify-content:space-between;gap:10px;align-items:center}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
-  .card{background:var(--card);padding:22px;border-radius:18px;box-shadow:0 8px 26px #00000012;margin-bottom:18px}
-  h2{font-size:26px;margin:0 0 18px;color:#1f2937}
-  h3{margin:10px 0 12px;color:#0f4c81}
-  label{display:block;font-weight:700;margin:10px 0 5px}
-  input,select,textarea{width:100%;padding:13px;border:1px solid #ccd6dd;border-radius:10px;font-size:15px;background:white}
-  textarea{min-height:95px}
-  button.primary,.btn{background:var(--teal);color:#fff;border:0;border-radius:10px;padding:12px 17px;font-weight:800;cursor:pointer;margin:5px 4px 5px 0}
-  button.secondary{background:#52616b;color:#fff;border:0;border-radius:10px;padding:12px 17px;font-weight:800;cursor:pointer;margin:5px 4px 5px 0}
-  button.danger{background:#c0392b;color:#fff;border:0;border-radius:10px;padding:12px 17px;font-weight:800;cursor:pointer}
-  .hidden{display:none!important}
-  table{width:100%;border-collapse:collapse;background:white}
-  th,td{border:1px solid #d7e0e6;padding:10px;text-align:left;vertical-align:top}
-  th{background:#e6f3f1}
-  .msg{margin-top:8px;color:#0f8b7f;font-weight:700;white-space:pre-wrap}
-  .err{color:#c0392b}
-  .small{font-size:13px;color:#667085}
-  .pill{display:inline-block;padding:6px 10px;border-radius:20px;background:#e8f7f5;color:#0f8b7f;font-weight:700}
-  .home-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
-  .dash{border-left:5px solid var(--teal)}
-  .preview{background:#f7fafc;border:1px dashed #9fb3c8;border-radius:10px;padding:12px;margin-top:10px;white-space:pre-wrap}
-  @media(max-width:600px){h1{font-size:23px}.logo{width:64px;height:64px}nav button{padding:13px 12px;font-size:14px}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>School ERP V6.1 Final</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <header class="top">
   <div class="brand">
-    <img class="logo" id="schoolLogo" alt="School Logo" src="logo.png" onerror="this.style.display='none'">
+    <img class="logo" id="schoolLogo" alt="School Logo" src="logo.jpg" onerror="this.style.display='none'">
     <div>
       <h1>स्व. गुरबक्षसिंग साबरवाल माध्यमिक व उच्च माध्यमिक विद्यालय, नायगाव (भिकापूर)</h1>
       <div class="sub">विद्यार्थी उपस्थिती, गृहपाठ, सूचना व पालक संपर्क व्यवस्थापन</div>
-      <div class="small" style="color:#fff">शैक्षणिक वर्ष 2026 - 2027</div>
+      <div class="small">शैक्षणिक वर्ष 2026 - 2027</div>
     </div>
   </div>
 </header>
@@ -69,343 +33,157 @@
 </nav>
 
 <main class="wrap">
-  <div class="userbar">
-    <span id="userEmail">Admin Panel</span>
-    <button class="danger" onclick="logout()">Logout</button>
-  </div>
-
-  <section id="login" class="card hidden">
-    <h2>Admin Login</h2>
-    <input id="loginEmail" placeholder="Email" value="dilippawar2207@gmail.com">
-    <input id="loginPass" placeholder="Password" type="password">
-    <button class="primary" onclick="login()">Login</button>
-    <button class="secondary" onclick="alert('Firebase जोडल्यावर Password Reset चालेल.')">Password Reset</button>
-    <div id="loginMsg" class="msg"></div>
+  <section id="home" class="card">
+    <h2>Admin Panel</h2>
+    <div class="stats">
+      <div><b>8वी</b><span>Homework / Attendance</span></div>
+      <div><b>9वी</b><span>Homework / Attendance</span></div>
+      <div><b>10वी</b><span>Homework / Attendance</span></div>
+      <div><b>WhatsBot</b><span>API Ready</span></div>
+    </div>
+    <h3>कार्यप्रवाह</h3>
+    <p>विद्यार्थी माहिती → उपस्थिती → गृहपाठ → सूचना → WhatsApp/SMS → रिपोर्ट</p>
   </section>
 
-  <section id="home" class="panel">
-    <div class="home-cards">
-      <div class="card dash"><h2>8वी</h2><p>Homework / Attendance</p></div>
-      <div class="card dash"><h2>9वी</h2><p>Homework / Attendance</p></div>
-      <div class="card dash"><h2>10वी</h2><p>Homework / Attendance</p></div>
-      <div class="card dash"><h2>WhatsBot</h2><p><span class="pill">API Ready</span></p></div>
-    </div>
-    <div class="card">
-      <h2>कार्यप्रवाह</h2>
-      <p>विद्यार्थी माहिती → उपस्थिती → गृहपाठ → सूचना → WhatsApp/SMS → रिपोर्ट</p>
-    </div>
-  </section>
-
-  <section id="students" class="panel hidden">
+  <section id="students" class="card hidden">
+    <h2>विद्यार्थी माहिती</h2>
     <div class="grid">
-      <div class="card">
-        <h2>विद्यार्थी माहिती</h2>
-        <label>इयत्ता</label><select id="sClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-        <label>रोल नंबर</label><input id="sRoll" type="number">
-        <label>विद्यार्थ्याचे नाव</label><input id="sName">
-        <label>जन्मदिनांक</label><input id="sDob" type="date">
-        <label>आधार क्रमांक</label><input id="sAadhar" maxlength="12">
-        <label>पालक मोबाईल 91 सहित</label><input id="sMobile" placeholder="917507514475">
-        <label>विद्यार्थी फोटो</label><input id="sPhoto" type="file" accept="image/*" capture="environment">
-        <button class="primary" onclick="saveStudent()">Save Student</button>
-        <button class="secondary" onclick="downloadStudentTemplate()">CSV Template Download</button>
-        <div id="studentMsg" class="msg"></div>
-      </div>
-      <div class="card">
-        <h2>विद्यार्थी यादी</h2>
-        <div style="overflow:auto"><table id="studentTable"></table></div>
-      </div>
+      <input id="studentClass" placeholder="इयत्ता 8वी / 9वी / 10वी">
+      <input id="roll" placeholder="रोल नंबर">
+      <input id="studentName" placeholder="विद्यार्थ्याचे नाव">
+      <input id="parentMobile" placeholder="पालक मोबाईल 91 सहित">
+      <input id="dob" type="date">
+      <input id="aadhaar" placeholder="आधार कार्ड">
+      <input id="photo" type="file" accept="image/*" capture="environment">
     </div>
+    <button onclick="saveStudent()">विद्यार्थी Save करा</button>
+    <button class="secondary" onclick="downloadStudentCSV()">Student CSV Download</button>
+    <div id="studentMsg" class="msg"></div>
   </section>
 
-  <section id="attendance" class="panel hidden">
-    <div class="card">
-      <h2>उपस्थिती P/A</h2>
-      <label>इयत्ता</label><select id="aClass" onchange="renderAttendance()"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-      <label>दिनांक</label><input id="aDate" type="date">
-      <button class="primary" onclick="renderAttendance()">यादी दाखवा</button>
-      <div style="overflow:auto"><table id="attendanceTable"></table></div>
-    </div>
-  </section>
-
-  <section id="homework" class="panel hidden">
+  <section id="attendance" class="card hidden">
+    <h2>उपस्थिती P/A</h2>
     <div class="grid">
-      <div class="card">
-        <h2>गणित – वर्गात झालेला अभ्यास व गृहपाठ</h2>
-        <label>इयत्ता</label><select id="hClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-        <label>दिनांक</label><input id="hDate" type="date">
-        <label>धडा / Topic</label><input id="hTopic" placeholder="उदा. रेखीय समीकरणे">
-        <label>वर्गात झालेला अभ्यास</label><textarea id="hStudy"></textarea>
-        <label>दिलेला गणित गृहपाठ</label><textarea id="hWork"></textarea>
-        <label>पालक मोबाईल 91 सहित / रिक्त ठेवल्यास वर्गातील सर्वांना</label><input id="hMobile">
-        <button class="primary" onclick="sendHomework()">Save + WhatsApp</button>
-        <button class="secondary" onclick="previewHomework()">Message Preview</button>
-        <div id="homeworkPreview" class="preview"></div>
-        <div id="homeworkMsg" class="msg"></div>
-      </div>
-      <div class="card">
-        <h2>गृहपाठ नोंदी</h2>
-        <table id="homeworkLog"></table>
-      </div>
-    </div>
-  </section>
-
-  <section id="notice" class="panel hidden">
-    <div class="grid">
-      <div class="card">
-        <h2>सुट्टीची सूचना</h2>
-        <label>इयत्ता</label><select id="nClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-        <label>दिनांक</label><input id="nDate" type="date">
-        <label>तपशील / कारण</label><textarea id="nDetails"></textarea>
-        <label>मोबाईल 91 सहित</label><input id="nMobile" placeholder="917507514475">
-        <button class="primary" onclick="sendNotice('सुट्टीची सूचना')">Save + WhatsApp</button>
-        <button class="secondary" onclick="previewNotice('सुट्टीची सूचना')">Preview</button>
-        <div id="noticePreview" class="preview"></div>
-        <div id="noticeMsg" class="msg"></div>
-      </div>
-      <div class="card">
-        <h2>शैक्षणिक कार्यक्रम</h2>
-        <label>इयत्ता</label><select id="eClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-        <label>दिनांक</label><input id="eDate" type="date">
-        <label>कार्यक्रम माहिती</label><textarea id="eDetails"></textarea>
-        <label>मोबाईल 91 सहित</label><input id="eMobile">
-        <button class="primary" onclick="sendEvent()">Save + WhatsApp</button>
-      </div>
-      <div class="card">
-        <h2>क्रीडा सूचना</h2>
-        <label>इयत्ता</label><select id="spClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
-        <label>दिनांक</label><input id="spDate" type="date">
-        <label>क्रीडा कार्यक्रम / सूचना</label><textarea id="spDetails"></textarea>
-        <label>मोबाईल 91 सहित</label><input id="spMobile">
-        <button class="primary" onclick="sendSports()">Save + WhatsApp</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="templates" class="panel hidden">
-    <div class="card">
-      <h2>Official Templates</h2>
-      <label>Template निवडा</label>
-      <select id="tplType" onchange="loadTemplate()">
-        <option>विद्यार्थी उपस्थित</option><option>विद्यार्थी अनुपस्थित</option><option>Half Day सूचना</option>
-        <option>गणित गृहपाठ</option><option>सुट्टीची सूचना</option><option>पालक सभा</option>
-        <option>परीक्षा सूचना</option><option>फी भरणा सूचना</option><option>क्रीडा सूचना</option>
+      <select id="attClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
+      <input id="attDate" type="date">
+      <select id="attStatus">
+        <option>Present</option><option>Absent</option><option>Half Day</option><option>Leave</option>
       </select>
-      <textarea id="tplText"></textarea>
-      <button class="primary" onclick="copyTemplate()">Copy Template</button>
-      <div id="tplMsg" class="msg"></div>
+      <input id="attMobile" placeholder="पालक मोबाईल 91 सहित">
+      <textarea id="attReason" placeholder="कारण / विशेष सूचना"></textarea>
     </div>
+    <button onclick="sendAttendance()">Save + WhatsApp</button>
+    <button class="secondary" onclick="previewAttendance()">Preview</button>
+    <div id="attPreview" class="preview"></div>
   </section>
 
-  <section id="books" class="panel hidden">
-    <div class="card">
-      <h2>महाराष्ट्र राज्य मंडळ पुस्तके / महत्त्वाच्या लिंक</h2>
-      <p class="small">येथे आपल्या शाळेने वापरायच्या अधिकृत PDF/Website links add करा.</p>
-      <label>शीर्षक</label><input id="bookTitle" placeholder="उदा. इयत्ता 10 गणित भाग 1">
-      <label>PDF / Website Link</label><input id="bookUrl">
-      <button class="primary" onclick="saveBook()">Link Save करा</button>
-      <table id="bookTable"></table>
+  <section id="homework" class="card hidden">
+    <h2>आज वर्गात शिकवलेले व गृहपाठ</h2>
+    <div class="grid">
+      <select id="hwClass"><option>8वी</option><option>9वी</option><option>10वी</option></select>
+      <input id="hwDate" type="date">
+      <input id="hwTopic" placeholder="धडा / Topic">
+      <textarea id="hwDone" placeholder="वर्गात झालेला अभ्यास"></textarea>
+      <textarea id="hwWork" placeholder="दिलेला गृहपाठ"></textarea>
+      <input id="hwMobile" placeholder="मोबाईल 91 सहित / वर्ग ग्रुप नंबर">
     </div>
+    <button onclick="sendHomework()">Save + WhatsApp</button>
+    <button class="secondary" onclick="previewHomework()">Preview</button>
+    <div id="hwPreview" class="preview"></div>
   </section>
 
-  <section id="csv" class="panel hidden">
-    <div class="card">
-      <h2>CSV Upload</h2>
-      <p>CSV format: class,roll,name,dob,aadhar,mobile</p>
-      <input id="csvFile" type="file" accept=".csv">
-      <button class="primary" onclick="uploadCsv()">Upload Students</button>
-      <button class="secondary" onclick="downloadStudentTemplate()">Template Download</button>
-      <div id="csvMsg" class="msg"></div>
+  <section id="notice" class="card hidden">
+    <h2>सूचना विभाग</h2>
+    <div class="cards">
+      <div class="mini">
+        <h3>सुट्टीची सूचना</h3>
+        <select id="leaveClass"><option>8वी</option><option>9वी</option><option>10वी</option><option>सर्व</option></select>
+        <input id="leaveDate" type="date">
+        <textarea id="leaveText" placeholder="तपशील / कारण"></textarea>
+        <input id="leaveMobile" placeholder="मोबाईल 91 सहित">
+        <button onclick="sendNotice('leave')">Save + WhatsApp</button>
+      </div>
+      <div class="mini">
+        <h3>शैक्षणिक कार्यक्रम</h3>
+        <select id="eduClass"><option>8वी</option><option>9वी</option><option>10वी</option><option>सर्व</option></select>
+        <input id="eduDate" type="date">
+        <textarea id="eduText" placeholder="कार्यक्रम माहिती"></textarea>
+        <input id="eduMobile" placeholder="मोबाईल 91 सहित">
+        <button onclick="sendNotice('edu')">Save + WhatsApp</button>
+      </div>
+      <div class="mini">
+        <h3>क्रीडा कार्यक्रम / सूचना</h3>
+        <select id="sportClass"><option>8वी</option><option>9वी</option><option>10वी</option><option>सर्व</option></select>
+        <input id="sportDate" type="date">
+        <textarea id="sportText" placeholder="क्रीडा कार्यक्रम / सूचना"></textarea>
+        <input id="sportMobile" placeholder="मोबाईल 91 सहित">
+        <button onclick="sendNotice('sport')">Save + WhatsApp</button>
+      </div>
     </div>
+    <div id="noticePreview" class="preview"></div>
   </section>
 
-  <section id="users" class="panel hidden">
-    <div class="card">
-      <h2>User ID / Password</h2>
-      <label>Role</label><select id="uRole"><option>Admin</option><option>Principal</option><option>Class Teacher</option><option>Special Teacher</option><option>Office</option></select>
-      <label>User ID</label><input id="uId">
-      <label>Password</label><input id="uPass">
-      <button class="primary" onclick="saveUser()">User Save</button>
-      <table id="userTable"></table>
-    </div>
+  <section id="templates" class="card hidden">
+    <h2>Official Templates</h2>
+    <button onclick="copyTemplate('present')">उपस्थित Template</button>
+    <button onclick="copyTemplate('absent')">अनुपस्थित Template</button>
+    <button onclick="copyTemplate('homework')">गृहपाठ Template</button>
+    <button onclick="copyTemplate('notice')">सूचना Template</button>
+    <textarea id="templateBox" rows="8"></textarea>
   </section>
 
-  <section id="settings" class="panel hidden">
-    <div class="card">
-      <h2>WhatsBot API Settings</h2>
-      <label>Proxy API URL</label><input id="setApiUrl" placeholder="https://your-vercel-project.vercel.app/api">
-      <label>API Token</label><input id="setToken" placeholder="WhatsBot API Token">
-      <label>Device ID</label><input id="setDevice" placeholder="46081">
-      <label>वर्ग शिक्षक नाव</label><input id="setTeacher" placeholder="श्री पवार डी.एम.">
-      <label>विशेष शिक्षक नाव</label><input id="setSpecialTeacher" placeholder="विशेष शिक्षक">
-      <button class="primary" onclick="saveSettings()">Settings Save</button>
-      <button class="secondary" onclick="testWhatsApp()">Test WhatsApp</button>
-      <div id="settingsMsg" class="msg"></div>
-    </div>
+  <section id="books" class="card hidden">
+    <h2>महाराष्ट्र स्टेट बोर्ड पुस्तके / लिंक</h2>
+    <ul>
+      <li>8वी गणित - PDF/Website Link येथे add करा</li>
+      <li>9वी गणित - PDF/Website Link येथे add करा</li>
+      <li>10वी गणित भाग 1 व भाग 2 - PDF/Website Link येथे add करा</li>
+      <li>आरोग्य व शारीरिक शिक्षण - PDF/Website Link येथे add करा</li>
+      <li>नवनीत गणित प्रयोग वही / महत्त्वाच्या लिंक्स येथे add करा</li>
+    </ul>
   </section>
 
-  <section id="reports" class="panel hidden">
-    <div class="card">
-      <h2>Reports</h2>
-      <button class="primary" onclick="renderReports()">Report पाहा</button>
-      <button class="secondary" onclick="downloadReportCsv()">CSV Download</button>
-      <div style="overflow:auto"><table id="reportTable"></table></div>
-    </div>
+  <section id="csv" class="card hidden">
+    <h2>CSV Upload</h2>
+    <input type="file" id="csvFile" accept=".csv">
+    <button onclick="uploadCSV()">CSV Upload करा</button>
+    <button class="secondary" onclick="downloadStudentCSV()">Sample CSV Download</button>
+    <div id="csvMsg" class="msg"></div>
+  </section>
+
+  <section id="users" class="card hidden">
+    <h2>User ID / Password</h2>
+    <input id="loginEmail" placeholder="Email / User ID" value="dilippawar2207@gmail.com">
+    <input id="loginPass" placeholder="Password" type="password">
+    <button onclick="alert('Demo Login तयार आहे. Firebase जोडल्यावर real login चालेल.')">Login</button>
+    <button class="secondary" onclick="alert('Password reset सुविधा Firebase मध्ये जोडता येईल.')">Password Reset</button>
+  </section>
+
+  <section id="settings" class="card hidden">
+    <h2>WhatsBot API Settings</h2>
+    <label>Proxy API URL</label>
+    <input id="proxyUrl" placeholder="https://your-vercel-project.vercel.app/api">
+    <label>API Token</label>
+    <input id="apiToken" placeholder="WhatsBot API Token">
+    <label>Device ID</label>
+    <input id="deviceId" placeholder="46081">
+    <label>वर्ग शिक्षक नाव</label>
+    <input id="classTeacher" value="श्री पवार डी.एम.">
+    <label>विशेष शिक्षक नाव</label>
+    <input id="specialTeacher" value="विशेष शिक्षक">
+    <button onclick="saveSettings()">Settings Save</button>
+    <button class="secondary" onclick="testWhatsApp()">Test WhatsApp</button>
+    <div id="settingsMsg" class="msg"></div>
+  </section>
+
+  <section id="reports" class="card hidden">
+    <h2>Reports</h2>
+    <button onclick="showReports()">Report पाहा</button>
+    <button class="secondary" onclick="downloadReportCSV()">CSV Download</button>
+    <div id="reportBox" class="preview"></div>
   </section>
 </main>
 
-<script>
-const SCHOOL="स्व. गुरबक्षसिंग साबरवाल माध्यमिक व उच्च माध्यमिक विद्यालय, नायगाव (भिकापूर)";
-const DEFAULT_SETTINGS={apiUrl:"",token:"",device:"",teacher:"श्री पवार डी.एम.",specialTeacher:"विशेष शिक्षक"};
-
-const TPL={
-"विद्यार्थी उपस्थित":`आदरणीय पालक,\nआपले पाल्य {student} इयत्ता {class} आज दिनांक {date} रोजी वेळ {time} वाजता शाळेत उपस्थित झाले आहेत.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"विद्यार्थी अनुपस्थित":`आदरणीय पालक,\nआज दिनांक {date} रोजी आपले पाल्य {student} इयत्ता {class} शाळेत अनुपस्थित आहेत. कृपया अनुपस्थितीचे कारण वर्ग शिक्षकांना कळवावे.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"Half Day सूचना":`आदरणीय पालक,\nआपले पाल्य {student} आज दिनांक {date} रोजी अर्धवेळ उपस्थित राहिले / सुट्टी घेऊन गेले आहेत. कृपया नोंद घ्यावी.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"गणित गृहपाठ":`आदरणीय पालक,\nआज दिनांक {date} रोजी इयत्ता {class} मध्ये गणित विषयात "{topic}" हा भाग शिकवण्यात आला.\nवर्गात झालेला अभ्यास: {study}\nदिलेला गृहपाठ: {homework}\nकृपया आपल्या पाल्याकडून गृहपाठ पूर्ण करून घ्यावा.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"सुट्टीची सूचना":`आदरणीय पालक,\nदिनांक {date} रोजी {custom} निमित्त शाळेला सुट्टी राहील. शाळा पुढील कामकाजाच्या दिवशी नियमित वेळेनुसार सुरू राहील.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"पालक सभा":`आदरणीय पालक,\nदिनांक {date} रोजी {custom} या संदर्भात पालक सभा आयोजित करण्यात आली आहे. कृपया वेळेवर उपस्थित राहावे.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"परीक्षा सूचना":`आदरणीय पालक,\nदिनांक {date} पासून {custom} परीक्षा/चाचणी सुरू होत आहे. कृपया आपल्या पाल्याची नियमित तयारी करून घ्यावी.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"फी भरणा सूचना":`आदरणीय पालक,\nआपल्या पाल्याची शालेय फी/बाकी रक्कम प्रलंबित आहे. कृपया ती लवकरात लवकर भरावी.\nवर्ग शिक्षक : {teacher}\n${SCHOOL}`,
-"क्रीडा सूचना":`आदरणीय पालक,\nदिनांक {date} रोजी {custom} क्रीडा कार्यक्रम/उपक्रम आयोजित करण्यात आला आहे. कृपया विद्यार्थ्यांना आवश्यक साहित्यासह पाठवावे.\nक्रीडा शिक्षक : {specialTeacher}\n${SCHOOL}`
-};
-
-function $(id){return document.getElementById(id)}
-function set(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}}
-function settings(){return {...DEFAULT_SETTINGS,...get('settings',{})}}
-function today(){return new Date().toISOString().slice(0,10)}
-function pad(n){return String(n).padStart(2,'0')}
-function marathiDate(input){
-  const months=["जानेवारी","फेब्रुवारी","मार्च","एप्रिल","मे","जून","जुलै","ऑगस्ट","सप्टेंबर","ऑक्टोबर","नोव्हेंबर","डिसेंबर"];
-  let d=input?new Date(input):new Date();
-  if(isNaN(d)) d=new Date();
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-function nowTime(){const d=new Date();return `${pad(d.getHours())}:${pad(d.getMinutes())}`}
-function cleanMobile(m){m=String(m||'').replace(/\D/g,''); if(m.length===10)m='91'+m; return m}
-function students(){let s=get('students',[]); if(!s.length){s=[
- {class:"8वी",roll:"1",name:"कु. शीतल प्रभाकर भालेराव",mobile:"917507514475"},
- {class:"9वी",roll:"1",name:"कु. रोहिणी संजय कसारे",mobile:"917507514475"},
- {class:"10वी",roll:"1",name:"कु. पायल संजय नाडे",mobile:"917507514475"}
-]; set('students',s)} return s}
-
-function openTab(id,btn){
-  document.querySelectorAll('.panel').forEach(x=>x.classList.add('hidden'));
-  $(id).classList.remove('hidden');
-  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  if(id==='students')renderStudents();
-  if(id==='attendance')renderAttendance();
-  if(id==='templates')loadTemplate();
-  if(id==='books')renderBooks();
-  if(id==='users')renderUsers();
-  if(id==='settings')loadSettings();
-  if(id==='reports')renderReports();
-}
-function login(){localStorage.setItem('logged','yes');$('userEmail').textContent=$('loginEmail').value||'Admin';$('login').classList.add('hidden');$('home').classList.remove('hidden')}
-function logout(){alert('Logout झाले.');}
-
-function saveStudent(){
- const mob=cleanMobile($('sMobile').value);
- if(mob.length<12) return $('studentMsg').textContent='मोबाईल नंबर 91 सहित बरोबर टाका.';
- const arr=students();
- arr.push({class:$('sClass').value,roll:$('sRoll').value,name:$('sName').value,dob:$('sDob').value,aadhar:$('sAadhar').value,mobile:mob});
- set('students',arr); $('studentMsg').textContent='विद्यार्थी माहिती save झाली.'; renderStudents();
-}
-function renderStudents(){
- let arr=students(); $('studentTable').innerHTML='<tr><th>Class</th><th>Roll</th><th>Name</th><th>Mobile</th></tr>'+
- arr.map(x=>`<tr><td>${x.class}</td><td>${x.roll}</td><td>${x.name}</td><td>${x.mobile}</td></tr>`).join('');
-}
-function downloadStudentTemplate(){
- const csv='class,roll,name,dob,aadhar,mobile\n8वी,1,विद्यार्थी नाव,2012-06-26,123456789012,917507514475\n';
- download('student_template.csv',csv);
-}
-function uploadCsv(){
- const f=$('csvFile').files[0]; if(!f)return $('csvMsg').textContent='CSV निवडा.';
- const r=new FileReader(); r.onload=()=>{let lines=r.result.split(/\r?\n/).slice(1).filter(Boolean); let arr=students();
- lines.forEach(line=>{let [cls,roll,name,dob,aadhar,mobile]=line.split(','); arr.push({class:cls,roll,name,dob,aadhar,mobile:cleanMobile(mobile)});});
- set('students',arr); $('csvMsg').textContent='CSV Upload पूर्ण.'; renderStudents();}; r.readAsText(f);
-}
-
-function attendanceMsg(st,status,date,time){
- const s=settings(); let type=status==='P'?'विद्यार्थी उपस्थित':status==='A'?'विद्यार्थी अनुपस्थित':'Half Day सूचना';
- return TPL[type].replaceAll('{student}',st.name).replaceAll('{class}',st.class).replaceAll('{date}',marathiDate(date)).replaceAll('{time}',time||nowTime()).replaceAll('{teacher}',s.teacher);
-}
-function renderAttendance(){
- let cls=$('aClass').value, arr=students().filter(x=>x.class===cls), date=$('aDate').value||today();
- $('attendanceTable').innerHTML='<tr><th>Roll</th><th>Name</th><th>P/A</th><th>Time</th><th>Message</th><th>WhatsApp</th></tr>'+
- arr.map((x,i)=>`<tr><td>${x.roll}</td><td>${x.name}</td><td><select id="pa${i}"><option>P</option><option>A</option><option>Half Day</option></select></td><td><input id="tm${i}" value="${nowTime()}"></td><td><textarea id="am${i}"></textarea></td><td><button class="primary" onclick="saveAttendance(${i})">Auto Send</button></td></tr>`).join('');
- window._attendanceArr=arr;
- arr.forEach((x,i)=>{$('am'+i).value=attendanceMsg(x,'P',date,nowTime())});
-}
-async function saveAttendance(i){
- const st=window._attendanceArr[i], status=$('pa'+i).value, date=$('aDate').value||today(), time=$('tm'+i).value||nowTime(), msg=$('am'+i).value||attendanceMsg(st,status,date,time);
- let logs=get('attendanceLogs',[]); logs.push({date:marathiDate(date),class:st.class,name:st.name,status,time,msg}); set('attendanceLogs',logs);
- await sendWhatsApp(st.mobile,msg);
- alert('उपस्थिती save झाली आणि WhatsApp request पाठवली.');
-}
-
-function homeworkMessage(){
- const s=settings();
- return TPL["गणित गृहपाठ"].replaceAll('{date}',marathiDate($('hDate').value||today())).replaceAll('{class}',$('hClass').value).replaceAll('{topic}',$('hTopic').value).replaceAll('{study}',$('hStudy').value).replaceAll('{homework}',$('hWork').value).replaceAll('{teacher}',s.teacher);
-}
-function previewHomework(){$('homeworkPreview').textContent=homeworkMessage()}
-async function sendHomework(){
- const msg=homeworkMessage(); previewHomework();
- let mob=cleanMobile($('hMobile').value); let targets=mob?[{mobile:mob}]:students().filter(x=>x.class===$('hClass').value);
- for(const t of targets) await sendWhatsApp(t.mobile,msg);
- let logs=get('homeworkLogs',[]); logs.push({date:marathiDate($('hDate').value||today()),class:$('hClass').value,topic:$('hTopic').value,msg}); set('homeworkLogs',logs); renderHomeworkLog();
- $('homeworkMsg').textContent='गृहपाठ save झाला आणि WhatsApp request पाठवली.';
-}
-function renderHomeworkLog(){let logs=get('homeworkLogs',[]);$('homeworkLog').innerHTML='<tr><th>Date</th><th>Class</th><th>Topic</th></tr>'+logs.map(x=>`<tr><td>${x.date}</td><td>${x.class}</td><td>${x.topic}</td></tr>`).join('')}
-
-function noticeMessage(type, cls, date, custom){
- const s=settings(); return TPL[type].replaceAll('{date}',marathiDate(date)).replaceAll('{class}',cls).replaceAll('{custom}',custom).replaceAll('{teacher}',s.teacher).replaceAll('{specialTeacher}',s.specialTeacher);
-}
-function previewNotice(type){$('noticePreview').textContent=noticeMessage(type,$('nClass').value,$('nDate').value||today(),$('nDetails').value)}
-async function sendNotice(type){
- const msg=noticeMessage(type,$('nClass').value,$('nDate').value||today(),$('nDetails').value); $('noticePreview').textContent=msg;
- await sendWhatsApp(cleanMobile($('nMobile').value),msg); saveNoticeLog(type,$('nClass').value,msg); $('noticeMsg').textContent='सूचना save झाली आणि WhatsApp request पाठवली.';
-}
-async function sendEvent(){let msg=noticeMessage('पालक सभा',$('eClass').value,$('eDate').value||today(),$('eDetails').value); await sendWhatsApp(cleanMobile($('eMobile').value),msg); alert('शैक्षणिक कार्यक्रम message request पाठवला.')}
-async function sendSports(){let msg=noticeMessage('क्रीडा सूचना',$('spClass').value,$('spDate').value||today(),$('spDetails').value); await sendWhatsApp(cleanMobile($('spMobile').value),msg); alert('क्रीडा सूचना message request पाठवला.')}
-function saveNoticeLog(type,cls,msg){let l=get('noticeLogs',[]);l.push({date:marathiDate(today()),type,class:cls,msg});set('noticeLogs',l)}
-
-function loadTemplate(){let t=$('tplType').value;$('tplText').value=TPL[t]||''}
-function copyTemplate(){navigator.clipboard.writeText($('tplText').value);$('tplMsg').textContent='Template copy झाले.'}
-
-function saveBook(){let b=get('books',[]);b.push({title:$('bookTitle').value,url:$('bookUrl').value});set('books',b);renderBooks()}
-function renderBooks(){let b=get('books',[]);$('bookTable').innerHTML='<tr><th>Title</th><th>Link</th></tr>'+b.map(x=>`<tr><td>${x.title}</td><td><a href="${x.url}" target="_blank">Open</a></td></tr>`).join('')}
-
-function saveUser(){let u=get('users',[]);u.push({role:$('uRole').value,id:$('uId').value,pass:$('uPass').value});set('users',u);renderUsers()}
-function renderUsers(){let u=get('users',[]);$('userTable').innerHTML='<tr><th>Role</th><th>User ID</th></tr>'+u.map(x=>`<tr><td>${x.role}</td><td>${x.id}</td></tr>`).join('')}
-
-function loadSettings(){let s=settings();$('setApiUrl').value=s.apiUrl;$('setToken').value=s.token;$('setDevice').value=s.device;$('setTeacher').value=s.teacher;$('setSpecialTeacher').value=s.specialTeacher}
-function saveSettings(){set('settings',{apiUrl:$('setApiUrl').value.trim(),token:$('setToken').value.trim(),device:$('setDevice').value.trim(),teacher:$('setTeacher').value.trim(),specialTeacher:$('setSpecialTeacher').value.trim()});$('settingsMsg').textContent='Settings save झाले.'}
-async function testWhatsApp(){await sendWhatsApp('917507514475','Test Message from School ERP - '+marathiDate(today()));}
-
-async function sendWhatsApp(mobile,message){
- const s=settings(); mobile=cleanMobile(mobile);
- if(!s.apiUrl) throwErr('API URL blank आहे. Settings मध्ये Proxy API URL टाका.');
- if(!mobile || mobile.length<12) throwErr('मोबाईल नंबर चुकीचा आहे.');
- const base=s.apiUrl.replace(/\/$/,'');
- const url=`${base}/send_sms?mobile=${encodeURIComponent(mobile)}&message=${encodeURIComponent(message)}&api_token=${encodeURIComponent(s.token)}&device_id=${encodeURIComponent(s.device)}`;
- try{
-   const r=await fetch(url); const txt=await r.text();
-   console.log('WhatsApp response',txt); return txt;
- }catch(e){
-   alert('WhatsApp Error: '+e.message+'\nProxy API Vercel वर Deploy आहे का तपासा.');
-   throw e;
- }
-}
-function throwErr(m){alert(m);throw new Error(m)}
-function renderReports(){
- const a=get('attendanceLogs',[]); $('reportTable').innerHTML='<tr><th>Date</th><th>Class</th><th>Name</th><th>Status</th><th>Time</th></tr>'+a.map(x=>`<tr><td>${x.date}</td><td>${x.class}</td><td>${x.name}</td><td>${x.status}</td><td>${x.time}</td></tr>`).join('');
-}
-function downloadReportCsv(){let a=get('attendanceLogs',[]);download('attendance_report.csv','date,class,name,status,time\n'+a.map(x=>[x.date,x.class,x.name,x.status,x.time].join(',')).join('\n'))}
-function download(name,content){const b=new Blob([content],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
-document.addEventListener('DOMContentLoaded',()=>{['aDate','hDate','nDate','eDate','spDate'].forEach(id=>$(id).value=today()); renderStudents(); renderHomeworkLog(); renderBooks(); renderUsers();});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
